@@ -58,8 +58,10 @@ function Restore-PreviousContainer {
         return $false
     }
 
-    docker logs $ContainerName > (Join-Path $script:LogDir "failed-deploy-$(Get-Date -Format 'yyyyMMdd-HHmmss').log") 2>&1
-    docker rm -f $ContainerName | Out-Null
+    if (Test-ContainerExists -Name $ContainerName) {
+        docker logs $ContainerName > (Join-Path $script:LogDir "failed-deploy-$(Get-Date -Format 'yyyyMMdd-HHmmss').log") 2>&1
+        docker rm -f $ContainerName | Out-Null
+    }
     docker start $previousContainerName | Out-Null
     docker rename $previousContainerName $ContainerName
 
