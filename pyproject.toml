@@ -1,0 +1,30 @@
+[project]
+name = "shipyard"
+version = "0.1.0"
+description = "Shipyard: a small FastAPI service demonstrating production DevOps practices"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "unit: fast deterministic tests with no external services",
+    "integration: tests requiring a running PostgreSQL database",
+    "docker: tests requiring a running Docker daemon and built image",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/__init__.py"]
