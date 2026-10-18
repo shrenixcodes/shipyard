@@ -8,7 +8,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:${PATH}"
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
+RUN pip install --no-cache-dir --upgrade pip==26.2.1 \
     && pip install --no-cache-dir -r requirements.txt
 
 
@@ -23,6 +23,9 @@ ENV APP_VERSION=${APP_VERSION} \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# curl's package version intentionally floats with the debian-slim base image;
+# pinning it would break rebuilds whenever the base image's apt snapshot rotates.
+# hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
@@ -39,10 +42,13 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chown -R shipyard:shipyard /app
 
-USER shipyard
+USER 1000:1000
 
 EXPOSE 8000
 
+# Shell form is required here for the `|| exit 1` fallback; JSON array form
+# cannot express conditional exit codes.
+# hadolint ignore=DL3025
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 \
     CMD curl --fail --silent http://localhost:8000/health || exit 1
 
