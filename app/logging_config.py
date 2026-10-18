@@ -1,12 +1,12 @@
 import logging
 import sys
 
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger.json import JsonFormatter
 
 
 def configure_logging(level: str = "INFO") -> None:
     handler = logging.StreamHandler(sys.stdout)
-    formatter = jsonlogger.JsonFormatter(
+    formatter = JsonFormatter(
         fmt="%(asctime)s %(levelname)s %(name)s %(message)s",
         rename_fields={"asctime": "timestamp", "levelname": "level", "name": "logger"},
     )

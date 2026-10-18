@@ -18,6 +18,7 @@ known-first-party = ["app"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "unit: fast deterministic tests with no external services",
     "integration: tests requiring a running PostgreSQL database",
