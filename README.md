@@ -120,6 +120,7 @@ All configuration is environment-driven (see `app/config.py` and `.env.example`)
 | Variable | Purpose | Default |
 |---|---|---|
 | `APP_ENV` | `development` / `test` / `production` | `development` |
+| `APP_NAME` | Used as the OpenAPI/docs title | `shipyard` |
 | `LOG_LEVEL` | Python logging level | `INFO` |
 | `APP_VERSION` | Reported by `/version` | `0.1.0` |
 | `GIT_SHA` | Reported by `/version`; set from CI build args | `unknown` |
@@ -189,7 +190,9 @@ curl -X PATCH http://localhost:8000/ships/<id> \
 curl -X DELETE http://localhost:8000/ships/<id>
 ```
 
-Interactive API docs are available at `http://localhost:8000/docs` while the app is running.
+Error responses use a consistent `{"detail": "..."}` shape; the 404/409 cases are documented
+in the OpenAPI schema per endpoint. Interactive API docs are available at
+`http://localhost:8000/docs` while the app is running.
 
 ## Testing
 

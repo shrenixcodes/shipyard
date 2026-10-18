@@ -40,10 +40,18 @@ Every pull request and push to `main` runs:
 
 ### Accepted exceptions
 
-None at this time. If an exception is ever required (e.g. a HIGH-severity finding with no
-upstream fix and no practical mitigation), it must be documented here with: the CVE ID, why
-it cannot be remediated immediately, the compensating control, and a target re-evaluation
-date. Do not silently suppress scanner findings.
+No CVE-level exceptions at this time. Two low-risk hadolint findings are suppressed inline
+in the `Dockerfile`, each with a justification comment immediately above it:
+
+| Rule | Why it's suppressed |
+|---|---|
+| `DL3008` (pin apt package versions) | `curl`'s version is left to float with the `python:3.12-slim` base image; pinning it would break rebuilds whenever the base image's own apt snapshot rotates, for a tool with no attack-surface relevance beyond the container healthcheck. |
+| `DL3025` (use JSON array form for CMD/ENTRYPOINT) | The `HEALTHCHECK` instruction needs shell form for its `|| exit 1` fallback, which JSON array form cannot express. |
+
+If a CVE-level exception is ever required (e.g. a HIGH-severity finding with no upstream fix
+and no practical mitigation), it must be documented here with: the CVE ID, why it cannot be
+remediated immediately, the compensating control, and a target re-evaluation date. Do not
+silently suppress scanner findings.
 
 ## Secrets handling
 
