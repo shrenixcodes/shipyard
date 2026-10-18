@@ -7,11 +7,15 @@ from app.models import ShipStatus
 
 
 class ShipCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     name: str = Field(min_length=1, max_length=120)
     status: ShipStatus = ShipStatus.KEEL_LAID
 
 
 class ShipUpdate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     name: str | None = Field(default=None, min_length=1, max_length=120)
     status: ShipStatus | None = None
 

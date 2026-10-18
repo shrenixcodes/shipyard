@@ -31,3 +31,18 @@ def test_ship_update_allows_partial_fields():
 def test_ship_create_rejects_unknown_status():
     with pytest.raises(ValidationError):
         ShipCreate(name="Discovery", status="not-a-real-status")
+
+
+def test_ship_create_rejects_whitespace_only_name():
+    with pytest.raises(ValidationError):
+        ShipCreate(name="   ")
+
+
+def test_ship_create_strips_surrounding_whitespace():
+    ship = ShipCreate(name="  Discovery  ")
+    assert ship.name == "Discovery"
+
+
+def test_ship_update_strips_surrounding_whitespace():
+    update = ShipUpdate(name="  Voyager  ")
+    assert update.name == "Voyager"

@@ -7,12 +7,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.models import Ship
-from app.schemas import ShipCreate, ShipRead, ShipUpdate
+from app.schemas import ErrorResponse, ShipCreate, ShipRead, ShipUpdate
 
 router = APIRouter(prefix="/ships", tags=["ships"])
 
+NOT_FOUND_RESPONSE = {status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}}
+CONFLICT_RESPONSE = {status.HTTP_409_CONFLICT: {"model": ErrorResponse}}
 
-@router.post("", response_model=ShipRead, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "",
+    response_model=ShipRead,
+    status_code=status.HTTP_201_CREATED,
+    responses=CONFLICT_RESPONSE,
+)
 async def create_ship(payload: ShipCreate, session: AsyncSession = Depends(get_session)) -> Ship:
     ship = Ship(name=payload.name, status=payload.status)
     session.add(ship)
@@ -33,7 +41,7 @@ async def list_ships(session: AsyncSession = Depends(get_session)) -> list[Ship]
     return list(result.scalars().all())
 
 
-@router.get("/{ship_id}", response_model=ShipRead)
+@router.get("/{ship_id}", response_model=ShipRead, responses=NOT_FOUND_RESPONSE)
 async def get_ship(ship_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> Ship:
     ship = await session.get(Ship, ship_id)
     if ship is None:
@@ -41,7 +49,11 @@ async def get_ship(ship_id: uuid.UUID, session: AsyncSession = Depends(get_sessi
     return ship
 
 
-@router.patch("/{ship_id}", response_model=ShipRead)
+@router.patch(
+    "/{ship_id}",
+    response_model=ShipRead,
+    responses={**NOT_FOUND_RESPONSE, **CONFLICT_RESPONSE},
+)
 async def update_ship(
     ship_id: uuid.UUID, payload: ShipUpdate, session: AsyncSession = Depends(get_session)
 ) -> Ship:
@@ -64,7 +76,7 @@ async def update_ship(
     return ship
 
 
-@router.delete("/{ship_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{ship_id}", status_code=status.HTTP_204_NO_CONTENT, responses=NOT_FOUND_RESPONSE)
 async def delete_ship(ship_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> None:
     ship = await session.get(Ship, ship_id)
     if ship is None:

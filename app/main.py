@@ -37,7 +37,12 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Shipyard", lifespan=lifespan)
+    settings = get_settings()
+    app = FastAPI(
+        title=settings.app_name.capitalize(),
+        version=settings.app_version,
+        lifespan=lifespan,
+    )
 
     app.add_middleware(MetricsMiddleware)
 

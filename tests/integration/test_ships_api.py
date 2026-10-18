@@ -27,6 +27,13 @@ def test_create_ship_with_invalid_payload_returns_422(client):
     assert response.status_code == 422
 
 
+def test_create_ship_treats_whitespace_padded_duplicate_as_conflict(client):
+    client.post("/ships", json={"name": "Nebuchadnezzar"})
+    response = client.post("/ships", json={"name": "  Nebuchadnezzar  "})
+
+    assert response.status_code == 409
+
+
 def test_list_ships_returns_created_ships(client):
     client.post("/ships", json={"name": "Voyager"})
     client.post("/ships", json={"name": "Defiant"})
